@@ -1,0 +1,42 @@
+# =============================================================================
+# WHATSAPP TOOL STACK
+#
+# WhatsApp Business Cloud API integration.
+# Receives webhooks from Meta, sends messages via Cloud API.
+# Uses shared Cloudflare Tunnel (add route: whatsapp.yourdomain.com -> api:8089)
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # WHATSAPP API - Webhook receiver + message sender
+  # ---------------------------------------------------------------------------
+  api:
+    build: .
+    container_name: whatsapp-api
+    environment:
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+      - WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+      - WHATSAPP_VERIFY_TOKEN=${WHATSAPP_VERIFY_TOKEN}
+      - WHATSAPP_APP_SECRET=${WHATSAPP_APP_SECRET:-}
+      - GATEKEEPER_URL=${GATEKEEPER_URL:-http://gatekeeper:8080}
+      - BOT_SERVICE_URL=${BOT_SERVICE_URL:-http://bot:8080}
+    ports:
+      - "8089:8089"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - instar-internal
+      - instar-network
+      - instar-bot
+
+networks:
+  instar-internal:
+    external: true
+  instar-network:
+    external: true
+  instar-bot:
+    external: true
