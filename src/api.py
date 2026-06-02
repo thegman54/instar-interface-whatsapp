@@ -202,6 +202,11 @@ async def process_message(sender: str, text: str, message_id: str):
             if not cleaned_message.strip():
                 return
 
+            # Gatekeeper short-circuit (e.g. no tools available)
+            if gk_data.get("response"):
+                await send_message(sender, gk_data["response"])
+                return
+
             # 2. Send to bot service
             bot_response = await client.post(
                 f"{BOT_SERVICE_URL}/chat",
