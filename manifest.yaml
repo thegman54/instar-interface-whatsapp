@@ -3,6 +3,7 @@ display_name: WhatsApp
 description: WhatsApp Business Cloud API — inbound webhooks from Meta
 version: "1.0"
 type: interface
+tenancy: single_tenant
 connection:
   pattern: webhook
   port: 8089
